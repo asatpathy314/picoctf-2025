@@ -1,7 +1,8 @@
 #include <stddef.h>
+#include <stdio.h>
 #define uint unsigned int
 
-uint check() 
+int main()
 {
   char param_1[0x1c] = {0}; // remove param and set it here
   size_t sVar1;
@@ -51,7 +52,7 @@ uint check()
         local_34 = 1 << (7U - (char)local_20 & 0x1f);
         uint value_of_flag = 0 < (int)((int)local_58[(int)local_24] & local_30);
         param_1[local_1c] |= value_of_flag << (7 - (char)local_20 & 0x1f);
-        
+
         local_20 = local_20 + 1;
         if (local_20 == 8) {
           local_20 = 0;
@@ -60,6 +61,7 @@ uint check()
         sVar3 = (size_t)local_1c;
         sVar1 = 0x1b;
         if (sVar3 == sVar1) {
+          printf("%s", param_1);
           return 0;
         }
       }
@@ -68,5 +70,6 @@ uint check()
   } else {
     uVar2 = 1;
   }
+  printf("%s", param_1);
   return uVar2;
 }
