@@ -13,27 +13,20 @@ def scramble(L):
     i += 1
   return L
 
-
-
 def get_flag():
-  flag = open('flag.txt', 'r').read()
+  flag = "time waste"
   flag = flag.strip()
   hex_flag = []
   for c in flag:
     hex_flag.append([str(hex(ord(c)))])
 
-  return [[i] for i in range (35)]
+  return hex_flag
+
 def main():
-  flag = [[i] for i in range (40)]
+  flag = get_flag()
   cypher = scramble(flag)
-  flag = []
-  for i in range(len(cypher)-2):
-    flag.append(((cypher[i][0])))
-    flag.append(((cypher[i][-1])))
-    print(flag)
-  flag.append(((cypher[-2][0])))
-  flag.append(((cypher[-1][0])))
-  print(flag)
+  print(cypher)
+
 
 if __name__ == '__main__':
   main()
