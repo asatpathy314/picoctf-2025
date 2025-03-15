@@ -243,9 +243,9 @@ def chachapoly1305_forgery_attack_general(ads:list[bytes], cts:list[bytes], tags
     return target_ct, target_tag
 
 def parse(message_enc):
-    ciphertext = message_enc[:-28].encode()
-    tag = message_enc[-28:-12].encode()
-    nonce = message_enc[-12:].encode()
+    ciphertext = message_enc[:-28]
+    tag = message_enc[-28:-12]
+    nonce = message_enc[-12:]
     return ciphertext, tag, nonce
 
 c1, t1, _ = parse(bytes.fromhex(input("Enter the first ciphertext: ")))
