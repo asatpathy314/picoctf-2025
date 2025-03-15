@@ -248,8 +248,8 @@ def parse(message_enc):
     nonce = message_enc[-12:].encode()
     return ciphertext, tag, nonce
 
-c1, t1, _ = parse(input("Enter the first ciphertext: "))
-c2, t2, _ = parse(input("Enter the second ciphertext: "))
+c1, t1, _ = parse(bytes.fromhex(input("Enter the first ciphertext: ")))
+c2, t2, _ = parse(bytes.fromhex(input("Enter the second ciphertext: ")))
 m1 = "Did you know that ChaCha20-Poly1305 is an authenticated encryption algorithm?".encode()
 m2 = "That means it protects both the confidentiality and integrity of data!".encode()
 
