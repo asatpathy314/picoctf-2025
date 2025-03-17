@@ -4,7 +4,7 @@
 
 int main()
 {
-  char param_1[0x1c] = {0}; // remove param and set it here
+  char param_1[0x1c] = {0}; // remove input and set it here manually to all zeroes
   size_t sVar1;
   uint uVar2;
   size_t sVar3;
@@ -50,9 +50,9 @@ int main()
         }
         local_30 = 1 << (7U - (char)local_28 & 0x1f);
         local_34 = 1 << (7U - (char)local_20 & 0x1f);
-        uint value_of_flag = 0 < (int)((int)local_58[(int)local_24] & local_30);
-        param_1[local_1c] |= value_of_flag << (7 - (char)local_20 & 0x1f);
-
+        uint value_of_flag = 0 < (int)((int)local_58[(int)local_24] & local_30); // get the value of the flag at the bit
+        param_1[local_1c] |= value_of_flag << (7 - (char)local_20 & 0x1f);  // instead of comparing set the value
+ 
         local_20 = local_20 + 1;
         if (local_20 == 8) {
           local_20 = 0;
@@ -70,6 +70,6 @@ int main()
   } else {
     uVar2 = 1;
   }
-  printf("%s", param_1);
+  printf("%s", param_1); // print the flag at the end
   return uVar2;
 }

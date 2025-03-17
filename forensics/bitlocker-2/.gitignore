@@ -1,2 +1,5 @@
 *.dd
 *.gz
+*.mem
+volatility3/
+bitlocker/
