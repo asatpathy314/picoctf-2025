@@ -242,15 +242,75 @@ def chachapoly1305_forgery_attack_general(ads:list[bytes], cts:list[bytes], tags
     target_tag = forge_poly1305_tag(target_ad, target_ct, r, s)
     return target_ct, target_tag
 
-def parse(message_enc):
-    ciphertext = message_enc[:-28]
-    tag = message_enc[-28:-12]
-    nonce = message_enc[-12:]
-    return ciphertext, tag, nonce
-
-c1, t1, _ = parse(bytes.fromhex(input("Enter the first ciphertext: ")))
-c2, t2, _ = parse(bytes.fromhex(input("Enter the second ciphertext: ")))
-m1 = "Did you know that ChaCha20-Poly1305 is an authenticated encryption algorithm?".encode()
-m2 = "That means it protects both the confidentiality and integrity of data!".encode()
-
-print(chachapoly1305_nonce_reuse_attack(m1, c1, t1, m2, c2, t2))
+if __name__ == "__main__":
+    # Your existing code defines these variables
+    p1 = 'Did you know that ChaCha20-Poly1305 is an authenticated encryption algorithm?'.encode()
+    p2 = 'That means it protects both the confidentiality and integrity of data!'.encode()
+    m1 = bytes.fromhex('912c35c92e6b1abce7591d2782c4da26216bd465a4ba9eeffc17e723e4908385b22008428e1878f6a50af831f58ee9c6b8e00b55fd691e1ac551f1f35afed80fb642181fa9c089d05b61d4303ee508b5de97eff14c96ada08fb2eef77db31d1f13055968736d794ae9')
+    m2 = bytes.fromhex('812d309d77690afde2445239d690c2353a3ff26eb18ad6eca153a253ff949f94e27f53048e0f3df9bf43f828e892f588ade70c14e0620e5fc74dfbf55aaec300f948590aa486720b6c4f49302dcd163461577b829771b31d1f13055968736d794ae9')
+    c1 = m1[:-28]
+    t1 = m1[-28:-12]
+    n1 = m1[-12:]
+    c2 = m2[:-28]
+    t2 = m2[-28:-12]
+    n2 = m2[-12:]
+    
+    # Verify that the nonces are the same (nonce reuse attack)
+    print(f"Nonce 1: {n1.hex()}")
+    print(f"Nonce 2: {n2.hex()}")
+    print(f"Nonces are the same: {n1 == n2}")
+    
+    # Step 1: Recover the Poly1305 key from nonce reuse
+    print("\n[+] Recovering Poly1305 key from nonce reuse...")
+    # Using empty associated data for simplicity
+    ad1 = b''
+    ad2 = b''
+    keys = chachapoly1305_nonce_reuse_attack(ad1, c1, t1, ad2, c2, t2)
+    
+    if len(keys) == 0:
+        print("[-] Failed to recover the key. Nonce might not be reused.")
+    else:
+        print(f"[+] Found {len(keys)} possible keys")
+        r, s = keys[0]
+        print(f"[+] Using key: r = {r}, s = {s}")
+        
+        # Step 2: Verify the recovered key by checking if it generates the correct tags
+        print("\n[+] Verifying recovered key...")
+        tag1_verify = forge_poly1305_tag(ad1, c1, r, s)
+        tag2_verify = forge_poly1305_tag(ad2, c2, r, s)
+        
+        print(f"Original tag 1: {t1.hex()}")
+        print(f"Computed tag 1: {tag1_verify.hex()}")
+        print(f"Tags match: {t1 == tag1_verify}")
+        
+        print(f"Original tag 2: {t2.hex()}")
+        print(f"Computed tag 2: {tag2_verify.hex()}")
+        print(f"Tags match: {t2 == tag2_verify}")
+        
+        # Step 3: Recover the keystream by XORing plaintext and ciphertext
+        print("\n[+] Recovering keystream...")
+        keystream = bytes([b1 ^ b2 for b1, b2 in zip(p1, c1)])
+        print(f"Keystream: {keystream.hex()[:32]}...")
+        
+        # Step 4: Forge a new message
+        print("\n[+] Forging a new message...")
+        target_plaintext = b"But it's only secure if used correctly!"
+        target_ad = b""
+        
+        # Ensure target plaintext isn't longer than the keystream
+        if len(target_plaintext) > len(keystream):
+            target_plaintext = target_plaintext[:len(keystream)]
+            print(f"[!] Truncated target plaintext to match keystream length: {target_plaintext}")
+        
+        # Encrypt the target plaintext using the recovered keystream
+        target_ct = bytes([b1 ^ b2 for b1, b2 in zip(keystream, target_plaintext)])
+        # Generate a valid tag for the forged message
+        target_tag = forge_poly1305_tag(target_ad, target_ct, r, s)
+        
+        print(f"Forged ciphertext: {target_ct.hex() + target_tag.hex() + n1.hex()}")
+        print(f"Forged tag: {target_tag.hex()}")
+        
+        # Step 5: Verify the forged message would decrypt correctly
+        decrypted = bytes([b1 ^ b2 for b1, b2 in zip(keystream, target_ct)])
+        print(f"\n[+] Verification - decrypted forged message: {decrypted.decode()}")
+        print(f"[+] Attack successful! The forged message will pass authentication.")

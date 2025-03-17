@@ -1,58 +1,43 @@
-import rsa
-import json
-from binascii import hexlify
+import hashlib
+import itertools
 
-def prepend(a, b):
-    return a + b
+def solve_cheese_challenge():
+    # Read the list of possible cheeses
+    with open("cheese_list.txt", "r") as f:
+        cheese_list = [line.strip() for line in f]
+    
+    # The target hash we need to match
+    target_hash = "6b75f4e10d0eb94012adc4880313d0b23cef33a86a58058c1ed55e94b9825693"
+    
+    # Try each cheese with each possible byte value at each position
+    for cheese in cheese_list:
+        for position in range(len(cheese) + 1):  # +1 to include position after the last character
+            for byte_value in range(256):  # All possible byte values (0-255)
+                # Insert the byte at the current position
+                byte_to_insert = bytes([byte_value])
+                modified_cheese = cheese[:position].encode() + byte_to_insert + cheese[position:].encode()
+                
+                # Calculate SHA-256 hash
+                hash_obj = hashlib.sha256(modified_cheese)
+                hash_value = hash_obj.hexdigest()
+                
+                # Check if hash matches target
+                if hash_value == target_hash:
+                    return cheese, position, byte_value, modified_cheese
+        
+        # Print progress to show the code is working
+        print(f"Checked cheese: {cheese}")
+    
+    return None, None, None, None
 
-def postpend(a, b):
-    return b + a
+# Run the solver
+cheese, position, byte_value, modified_cheese = solve_cheese_challenge()
 
-def prepostpend(a, b):
-    return b[0] + a + b[1]
-
-def create_rainbow_table(cheese_file):
-    with open(cheese_file, "r") as f:
-        cheeses = [line.strip() for line in f.readlines()]
-
-    salting_engine = [
-        lambda x, y: prepend(x, y),
-        lambda x, y: postpend(x, y),
-        lambda x, y: prepostpend(x, y),
-    ]
-
-    preparation_engine = [
-        lambda x: x.upper(),
-        lambda x: x.lower()
-    ]
-
-    rainbow_table = dict()
-    # Iterate through all possible 2-nibble hex values (00-FF)
-    for salt in [f"{i:02x}" for i in range(256)]:
-        print(salt)
-        for cheese in cheeses:
-            for salter in salting_engine:
-                for preparer in preparation_engine:
-                    # Concatenate cheese with the hex salt
-                    salted_cheese = salter(cheese, preparer(salt))
-                    # Create SHA256 hash
-                    h = rsa.compute_hash(salted_cheese.encode('ascii'), method_name="SHA-256")
-                    digest = hexlify(h).decode('ascii')
-                    # Store the original cheese (without salt) as the value
-                    rainbow_table[digest] = (cheese, preparer(salt))
-            
-    with open("rainbow_table.json", "w") as f:
-        json.dump(rainbow_table, f)
-
-if __name__ == "__main__":
-    create_rainbow_table("cheese_list.txt")
-    with open("rainbow_table.json", "r") as f:
-        table = json.load(f)
-
-    while True:
-        query = input("Input a hash to look it up in the table: ")
-        print(bytes(query, encoding='ascii'))
-        if query in table:
-            print(f"Cheese is {table[query]}.")
-        else:
-            print("Cheese not found.")
+if cheese:
+    print(f"Found the cheese: {cheese}")
+    print(f"Byte inserted: {byte_value} (hex: {byte_value:02x})")
+    print(f"Position: {position}")
+    print(f"Full string that was hashed: {modified_cheese}")
+    print(f"Full string (hex): {modified_cheese.hex()}")
+else:
+    print("No matching cheese found.")
