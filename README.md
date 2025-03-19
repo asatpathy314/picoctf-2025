@@ -12,4 +12,6 @@ All my solutions/writeups are in here. The only challenges that aren't included 
 
 If you find this useful, come check out my CTF writeups website for more detail on my solutions to `handoff`, `echo-valley`, and `perplexed`!
 
+If you have a better/cleaner solution or a solution for an unsolved challenge here, feel free to make a PR!
+
 https://asatpathy314.github.io/ctf-writeups/.
