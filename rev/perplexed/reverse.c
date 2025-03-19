@@ -1,3 +1,4 @@
+// reversed by binaryninja
 #include <stddef.h>
 #include <stdio.h>
 #define uint unsigned int

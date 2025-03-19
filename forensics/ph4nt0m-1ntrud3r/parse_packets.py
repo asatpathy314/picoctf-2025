@@ -5,6 +5,8 @@ from base64 import b64decode
 with open("packets.json", "r") as f:
     packets = json.load(f)
 
+# this gets you most of the way there, had to manually edit a bit though.
+
 parsed_data = []
 print(float(packets[0]['_source']['layers']['frame']['frame.time_delta']))
 packets = sorted(packets, key = lambda x: float(x['_source']['layers']['frame']['frame.time_delta']))

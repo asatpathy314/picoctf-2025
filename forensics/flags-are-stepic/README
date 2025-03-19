@@ -1,5 +1,0 @@
-Note that you must configure the following command on some Kali VMs to use zsteg.
-
-```bash
-export RUBY_THREAD_VM_STACK_SIZE=50000000
-```
