@@ -243,7 +243,6 @@ def chachapoly1305_forgery_attack_general(ads:list[bytes], cts:list[bytes], tags
     return target_ct, target_tag
 
 if __name__ == "__main__":
-    # Your existing code defines these variables
     p1 = 'Did you know that ChaCha20-Poly1305 is an authenticated encryption algorithm?'.encode()
     p2 = 'That means it protects both the confidentiality and integrity of data!'.encode()
     m1 = bytes.fromhex('912c35c92e6b1abce7591d2782c4da26216bd465a4ba9eeffc17e723e4908385b22008428e1878f6a50af831f58ee9c6b8e00b55fd691e1ac551f1f35afed80fb642181fa9c089d05b61d4303ee508b5de97eff14c96ada08fb2eef77db31d1f13055968736d794ae9')
@@ -262,7 +261,6 @@ if __name__ == "__main__":
     
     # Step 1: Recover the Poly1305 key from nonce reuse
     print("\n[+] Recovering Poly1305 key from nonce reuse...")
-    # Using empty associated data for simplicity
     ad1 = b''
     ad2 = b''
     keys = chachapoly1305_nonce_reuse_attack(ad1, c1, t1, ad2, c2, t2)
